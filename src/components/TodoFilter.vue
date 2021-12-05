@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex justify-content-center py-1">
+  <div class="d-flex justify-content-center pt-3">
     <button class="btn btn-primary mx-1"
       @click="showAllListItems"
     >Все</button>

@@ -32,10 +32,10 @@ export default {
   methods: {
     changeCheck() {
       this.value = !this.value
-      this.$emit('update', this.value, this.curItem.id)
+      this.$emit('update', this.value, this.curItem.dbkey)
     },
     deleteCurItem() {
-      this.$emit('deleteItem', this.curItem.id)
+      this.$emit('deleteItem')
     },
   }
 }
