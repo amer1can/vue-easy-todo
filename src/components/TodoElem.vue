@@ -5,7 +5,7 @@
     <div class="align-self-center mx-5">
       <input type="checkbox"
              :checked="curItem.checked"
-             @change="changeCheck"
+             @click="changeCheck"
       >
     </div>
     <div class="px-2 py-1 my-1 text-start flex-grow-1 flex-wrap">
@@ -13,7 +13,9 @@
       <p class="lead mb-4">{{ curItem.text }}</p>
     </div>
     <button type="button" class="btn btn-dark btn-lg px-4 gap-3 align-self-center mx-1"
+            @click="editThis(curItem.dbkey)"
     >Редактировать</button>
+
     <button type="button" class="btn btn-dark btn-lg px-4 gap-3 align-self-center mx-4"
       @click="deleteCurItem"
     >Удалить</button>
@@ -24,6 +26,7 @@
 export default {
   name: "TodoElemComponent",
   props: ['curItem'],
+  emits: ['deleteItem', 'update', 'editItem'],
   data() {
     return {
       value: this.curItem.checked
@@ -37,6 +40,9 @@ export default {
     deleteCurItem() {
       this.$emit('deleteItem')
     },
+    editThis(key) {
+      this.$emit('editItem', key)
+    }
   }
 }
 </script>

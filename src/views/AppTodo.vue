@@ -18,6 +18,7 @@
         :curItem="item"
         @update="updateNow"
         @delete-item="delItem(item.dbkey)"
+        @edit-item="editTodo"
     ></todo-elem>
   </div>
 </template>
@@ -26,7 +27,7 @@
 import TodoElem from "@/components/TodoElem";
 import TodoHeader from "@/components/TodoHeader";
 import TodoFilter from "@/components/TodoFilter";
-// import axios from "axios";
+import axios from "axios";
 
 export default {
   name: "AppTodo",
@@ -49,39 +50,42 @@ export default {
   },
   methods: {
     async showAllList() {
-      const response = await fetch('https://training-db-16ce6-default-rtdb.firebaseio.com/tasks.json')
-      const data = await response.json()
+      const response = await axios.get('https://training-db-16ce6-default-rtdb.firebaseio.com/tasks.json')
+      const data = await response.data
       this.itemsList = Object.keys(data).map(key => {
         return {
           dbkey: key,
           ...data[key]
         }
       })
-      console.log(this.itemsList)
     },
     showActiveList() {
       this.itemsList = this.itemsList.filter(item => item.checked === false)
     },
     async saveLocal() {
-      await fetch('https://training-db-16ce6-default-rtdb.firebaseio.com/tasks.json', {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          id: this.id,
-          text: this.text,
-          title: this.title,
-          checked: this.checked
-        })
+      await axios.post('https://training-db-16ce6-default-rtdb.firebaseio.com/tasks.json', {
+            id: this.id,
+            text: this.text,
+            title: this.title,
+            checked: this.checked
       })
+      // await fetch('https://training-db-16ce6-default-rtdb.firebaseio.com/tasks.json', {
+      //   method: "POST",
+      //   headers: {
+      //     'Content-Type': 'application/json'
+      //   },
+      //   body: JSON.stringify({
+      //     id: this.id,
+      //     text: this.text,
+      //     title: this.title,
+      //     checked: this.checked
+      //   })
+      // })
 
       await this.showAllList()
     },
     addNewTask(newTitle, newText) {
-
       let lastId;
-
       if (this.itemsList !== null) {
         lastId = this.itemsList[this.itemsList.length - 1].id
       } else {
@@ -96,23 +100,21 @@ export default {
       this.saveLocal()
     },
     async delItem(key) {
-      await fetch(`https://training-db-16ce6-default-rtdb.firebaseio.com/tasks/${key}.json`, {
-        method: 'DELETE'
-      })
-      // await axios.delete(`https://training-db-16ce6-default-rtdb.firebaseio.com/tasks/${key}.json`)
-      await this.showAllList()
+      const curDel = this.itemsList.findIndex(elem => elem.dbkey === key)
+      this.itemsList.splice(curDel,1)
+      await axios.delete(`https://training-db-16ce6-default-rtdb.firebaseio.com/tasks/${key}.json`)
     },
     async updateNow(val, key) {
-      await fetch(`https://training-db-16ce6-default-rtdb.firebaseio.com/tasks/${key}.json`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          checked: val
-        })
+      const curUpdate = this.itemsList.find(elem => elem.dbkey === key)
+      curUpdate.checked = val
+      await axios.patch(`https://training-db-16ce6-default-rtdb.firebaseio.com/tasks/${key}.json`, {
+        checked: val
       })
     },
+    async editTodo(key) {
+      const curItem = this.itemsList.find(elem => elem.dbkey === key)
+      console.log('edit: ', curItem.title)
+    }
   }
 }
 </script>
