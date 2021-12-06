@@ -6,18 +6,27 @@
       <input type="checkbox"
              :checked="curItem.checked"
              @click="changeCheck"
+             :disabled="this.mode === 'edit'"
       >
     </div>
     <div class="px-2 py-1 my-1 text-start flex-grow-1 flex-wrap">
-      <h6 class="display-6 fw-bold">{{ curItem.title }}</h6>
-      <p class="lead mb-4">{{ curItem.text }}</p>
+      <div v-if="this.mode == null">
+        <h6 class="display-6 fw-bold">{{ curItem.title }}</h6>
+        <p class="lead mb-4">{{ curItem.text }}</p>
+      </div>
+      <div v-else>
+        <input class="form-control" type="text" :value="curItem.title"><br>
+        <input class="form-control" type="text" :value="curItem.text">
+      </div>
+
     </div>
     <button type="button" class="btn btn-dark btn-lg px-4 gap-3 align-self-center mx-1"
             @click="editThis(curItem.dbkey)"
-    >Редактировать</button>
+    >{{ this.mode === null ? 'Редактировать' : 'Применить' }}</button>
 
     <button type="button" class="btn btn-dark btn-lg px-4 gap-3 align-self-center mx-4"
       @click="deleteCurItem"
+      :disabled="this.mode === 'edit'"
     >Удалить</button>
   </div>
 </template>
@@ -29,7 +38,8 @@ export default {
   emits: ['deleteItem', 'update', 'editItem'],
   data() {
     return {
-      value: this.curItem.checked
+      value: this.curItem.checked,
+      mode: null
     }
   },
   methods: {
@@ -41,7 +51,12 @@ export default {
       this.$emit('deleteItem')
     },
     editThis(key) {
-      this.$emit('editItem', key)
+      if (this.mode === null ) {
+        this.mode = 'edit'
+      } else {
+        this.mode = null
+        this.$emit('editItem', key)
+      }
     }
   }
 }

@@ -8,25 +8,32 @@
       </div>
       <button class="btn btn-dark mt-2 mx-5" @click="sendNewTask">Добавить</button>
     </div>
-
   </header>
 </template>
 
 <script>
 export default {
   name: "HeaderComponent",
-  props: ['savedTitle, savedText'],
+  props: ['savedTitle', 'savedText'],
   data() {
     return {
       innTitle: '',
-      innText: ''
+      innText: '',
     }
   },
+  // updated() {
+  //   this.innTitle = this.savedTitle
+  //   this.innText = this.savedText
+  // },
   methods: {
     sendNewTask() {
       this.$emit('addTodo', this.innTitle, this.innText)
       this.innTitle = ''
       this.innText = ''
+    },
+    reload() {
+      this.innTitle = this.savedTitle
+      this.innText = this.savedText
     }
   }
 }

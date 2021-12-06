@@ -2,6 +2,8 @@
   <div class="container">
     <todo-header
         @add-todo="addNewTask"
+        :saved-title="editTitle"
+        :saved-text="editText"
     ></todo-header>
     <todo-filter
         @show-all="showAllList"
@@ -42,7 +44,9 @@ export default {
       id: 0,
       text: '',
       title: '',
-      checked: false
+      checked: false,
+      editTitle: null,
+      editText: null
     }
   },
   mounted() {
@@ -113,7 +117,8 @@ export default {
     },
     async editTodo(key) {
       const curItem = this.itemsList.find(elem => elem.dbkey === key)
-      console.log('edit: ', curItem.title)
+      this.editTitle = curItem.title
+      this.editText = curItem.text
     }
   }
 }
