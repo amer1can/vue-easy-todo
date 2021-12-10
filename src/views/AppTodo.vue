@@ -2,58 +2,67 @@
   <div class="container">
     <todo-header
         @add-todo="addNewTask"
+        @change-app-title="changeAppTitle"
         :saved-title="editTitle"
         :saved-text="editText"
+        :app-title="globalAppName"
     ></todo-header>
     <todo-filter
         @show-all="showAllList"
         @show-active="showActiveList"
+        @show-de-active="showDeActiveList"
     ></todo-filter>
     <hr>
-    <div class="empty" v-if="itemsList === null">
+    <div class="empty" v-if="!filteredList || filteredList.length === 0">
       <h1>Список пуст</h1>
     </div>
     <todo-elem
         v-else
-        v-for="item in itemsList"
+        v-for="item in filteredList"
         :key="item.dbkey"
         :curItem="item"
         @update="updateNow"
         @delete-item="delItem(item.dbkey)"
         @edit-item="editTodo"
     ></todo-elem>
+    <hr>
+    <todo-list></todo-list>
   </div>
 </template>
 
 <script>
-import TodoElem from "@/components/TodoElem";
-import TodoHeader from "@/components/TodoHeader";
-import TodoFilter from "@/components/TodoFilter";
+import TodoElem from "@/components/Todo/TodoElem";
+import TodoHeader from "@/components/Todo/TodoHeader";
+import TodoFilter from "@/components/Todo/TodoFilter";
 import axios from "axios";
+import TodoList from "@/components/Todo/TodoList";
 
 export default {
   name: "AppTodo",
   components: {
+    TodoList,
     TodoElem,
     TodoHeader,
     TodoFilter
   },
   data() {
     return {
+      globalAppName: 'Simple Todo',
       itemsList: [],
       id: 0,
       text: '',
       title: '',
       checked: false,
       editTitle: null,
-      editText: null
+      editText: null,
+      filteredList: null
     }
   },
   mounted() {
-    this.showAllList()
+    this.loadList()
   },
   methods: {
-    async showAllList() {
+    async loadList() {
       const response = await axios.get('https://training-db-16ce6-default-rtdb.firebaseio.com/tasks.json')
       const data = await response.data
       this.itemsList = Object.keys(data).map(key => {
@@ -62,9 +71,18 @@ export default {
           ...data[key]
         }
       })
+
+      this.filteredList = this.itemsList
+
+    },
+    showAllList() {
+      this.filteredList = this.itemsList
     },
     showActiveList() {
-      this.itemsList = this.itemsList.filter(item => item.checked === false)
+      this.filteredList = this.itemsList.filter(item => item.checked === false)
+    },
+    showDeActiveList() {
+      this.filteredList = this.itemsList.filter(item => item.checked === true)
     },
     async saveLocal() {
       await axios.post('https://training-db-16ce6-default-rtdb.firebaseio.com/tasks.json', {
@@ -73,20 +91,7 @@ export default {
             title: this.title,
             checked: this.checked
       })
-      // await fetch('https://training-db-16ce6-default-rtdb.firebaseio.com/tasks.json', {
-      //   method: "POST",
-      //   headers: {
-      //     'Content-Type': 'application/json'
-      //   },
-      //   body: JSON.stringify({
-      //     id: this.id,
-      //     text: this.text,
-      //     title: this.title,
-      //     checked: this.checked
-      //   })
-      // })
-
-      await this.showAllList()
+      await this.loadList()
     },
     addNewTask(newTitle, newText) {
       let lastId;
@@ -106,19 +111,30 @@ export default {
     async delItem(key) {
       const curDel = this.itemsList.findIndex(elem => elem.dbkey === key)
       this.itemsList.splice(curDel,1)
+
       await axios.delete(`https://training-db-16ce6-default-rtdb.firebaseio.com/tasks/${key}.json`)
     },
     async updateNow(val, key) {
       const curUpdate = this.itemsList.find(elem => elem.dbkey === key)
       curUpdate.checked = val
+
       await axios.patch(`https://training-db-16ce6-default-rtdb.firebaseio.com/tasks/${key}.json`, {
         checked: val
       })
     },
-    async editTodo(key) {
-      const curItem = this.itemsList.find(elem => elem.dbkey === key)
-      this.editTitle = curItem.title
-      this.editText = curItem.text
+    async editTodo(key, newTitle, newText) {
+      const curUpdate = this.itemsList.find(elem => elem.dbkey === key)
+      curUpdate.title = newTitle
+      curUpdate.text = newText
+
+      await axios.patch(`https://training-db-16ce6-default-rtdb.firebaseio.com/tasks/${key}.json`, {
+        title: newTitle,
+        text:  newText
+      })
+    },
+    changeAppTitle(newTitle) {
+      this.globalAppName = newTitle
+      console.log(this.globalAppName)
     }
   }
 }

@@ -15,8 +15,8 @@
         <p class="lead mb-4">{{ curItem.text }}</p>
       </div>
       <div v-else>
-        <input class="form-control" type="text" :value="curItem.title"><br>
-        <input class="form-control" type="text" :value="curItem.text">
+        <input class="form-control" type="text" v-model="newTitle"><br>
+        <input class="form-control" type="text" v-model="newText">
       </div>
 
     </div>
@@ -39,7 +39,9 @@ export default {
   data() {
     return {
       value: this.curItem.checked,
-      mode: null
+      mode: null,
+      newTitle: this.curItem.title,
+      newText: this.curItem.text
     }
   },
   methods: {
@@ -55,7 +57,7 @@ export default {
         this.mode = 'edit'
       } else {
         this.mode = null
-        this.$emit('editItem', key)
+        this.$emit('editItem', key, this.newTitle, this.newText)
       }
     }
   }

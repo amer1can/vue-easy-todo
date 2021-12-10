@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import MainHeader from "@/components/MainHeader";
+import MainHeader from "@/components/Main/MainHeader";
 
 export default {
   name: 'App',
@@ -16,13 +16,18 @@ export default {
 </script>
 
 <style>
+
+body {
+  background: black!important;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 10px;
 }
 .add {
   max-width: 400px;
@@ -30,6 +35,12 @@ export default {
 }
 .nav a.router-link-exact-active {
   color: #fff;
-  background-color: #0d6efd;
+  background-color: #e53c69;
 }
+
+/*.leaflet-interactive:hover {*/
+/*  -webkit-box-shadow: 0px 5px 10px 20px rgba(43, 161, 251, 0.2);*/
+/*  -moz-box-shadow: 0px 5px 10px 20px rgba(43, 161, 251, 0.2);*/
+/*  box-shadow: 0px 5px 10px 20px rgba(43, 161, 251, 0.2);*/
+/*}*/
 </style>

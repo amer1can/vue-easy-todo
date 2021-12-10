@@ -6,19 +6,26 @@
     <button class="btn btn-primary mx-1"
       @click="showOnlyActive"
     >Активные</button>
+    <button class="btn btn-primary mx-1"
+            @click="showOnlyDeActive"
+    >Не активные</button>
+
   </div>
 </template>
 
 <script>
 export default {
   name: "FilterComponent",
-  emits: ['showAllListItems', 'showOnlyActive'],
+  emits: ['showAllListItems', 'showOnlyActive', 'showOnlyDeActive'],
   methods: {
     showAllListItems() {
       this.$emit('showAll')
     },
     showOnlyActive() {
       this.$emit('showActive')
+    },
+    showOnlyDeActive() {
+      this.$emit('showDeActive')
     }
   }
 }
